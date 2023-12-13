@@ -13,20 +13,19 @@ export const employeeFunction = async (uploadedFile: any) => {
   const dbDepartments: Record<string, Departments> = {};
   const dbSites: Record<string, Sites> = {};
 
-  const dbEmployees = await employeeModel.find({});
-  dbEmployees.forEach((emp) => {
-    dbEmployeRecords[emp.firstName] = emp;
-  });
+  const loadDbRecords = async (model: any, dbRecords: Record<string, any>) => {
+    const records = await model.find({});
+    records.forEach((record: any) => {
+      dbRecords[record.firstName || record.departmentName || record.siteName] =
+        record;
+    });
+  };
 
-  const dbDepartmentRecords = await departmentModel.find({});
-  dbDepartmentRecords.forEach((dept) => {
-    dbDepartments[dept.departmentName] = dept;
-  });
-
-  const dbSiteRecords = await siteModel.find({});
-  dbSiteRecords.forEach((site) => {
-    dbSites[site.siteName] = site;
-  });
+  await Promise.all([
+    loadDbRecords(employeeModel, dbEmployeRecords),
+    loadDbRecords(departmentModel, dbDepartments),
+    loadDbRecords(siteModel, dbSites),
+  ]);
 
   const csvData = uploadedFile.buffer.toString("utf8");
 
