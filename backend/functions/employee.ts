@@ -8,6 +8,26 @@ export const employeeFunction = async (uploadedFile: any) => {
   const employees: Employees[] = [];
   const departments: Departments[] = [];
   const sites: Sites[] = [];
+
+  const dbEmployeRecords: Record<string, Employees> = {};
+  const dbDepartments: Record<string, Departments> = {};
+  const dbSites: Record<string, Sites> = {};
+
+  const dbEmployees = await employeeModel.find({});
+  dbEmployees.forEach((emp) => {
+    dbEmployeRecords[emp.firstName] = emp;
+  });
+
+  const dbDepartmentRecords = await departmentModel.find({});
+  dbDepartmentRecords.forEach((dept) => {
+    dbDepartments[dept.departmentName] = dept;
+  });
+
+  const dbSiteRecords = await siteModel.find({});
+  dbSiteRecords.forEach((site) => {
+    dbSites[site.siteName] = site;
+  });
+
   const csvData = uploadedFile.buffer.toString("utf8");
 
   const parseStream = csvParser()
@@ -20,49 +40,42 @@ export const employeeFunction = async (uploadedFile: any) => {
       const siteName = data.siteName;
       const departmentId = data.departmentId;
       const id = data.id;
-      employees.push({
+
+      const employee: Employees = {
         id,
         firstName,
         lastName,
         address,
         siteId,
         departmentId,
-      });
-      departments.push({ departmentId, departmentName });
-      sites.push({ siteId, siteName });
+      };
+      const department: Departments = { departmentId, departmentName };
+      const site: Sites = { siteId, siteName };
+
+      if (!dbEmployeRecords[firstName]) {
+        dbEmployeRecords[firstName] = employee;
+        employees.push(employee);
+      } else {
+        console.log("Record Exists");
+      }
+      if (!dbDepartments[departmentName]) {
+        dbDepartments[departmentName] = department;
+        departments.push(department);
+      } else {
+        console.log("Record exists");
+      }
+      if (!dbSites[siteName]) {
+        dbSites[siteName] = site;
+        sites.push(site);
+      } else {
+        console.log("Record Exists");
+      }
     })
     .on("end", async () => {
       try {
-        for (const employee of employees) {
-          const existingDepartment = await employeeModel.find({
-            employeeName: employee.firstName,
-          });
-          if (!existingDepartment) {
-            await employeeModel.create(employee);
-          } else {
-            console.log("available");
-          }
-        }
-        for (const site of sites) {
-          const existingSite = await siteModel.find({
-            siteName: site.siteName,
-          });
-          if (!existingSite) {
-            await siteModel.create(site);
-          } else {
-            console.log("available");
-          }
-        }
-        for (const department of departments) {
-          const existingDepartment = await departmentModel.find({
-            departmentName: department.departmentName,
-          });
-          if (!existingDepartment) {
-            await departmentModel.create(department);
-          } else {
-            console.log("available");
-          }
-        }
+        await employeeModel.insertMany(employees);
+        await departmentModel.insertMany(departments);
+        await siteModel.insertMany(sites);
       } catch (error) {
         console.log(error);
       }
