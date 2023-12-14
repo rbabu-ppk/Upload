@@ -4,6 +4,20 @@
   padding: 2rem;
   text-align: center;
 }
+
+input#upload_email {
+  padding: 4px 42px;
+}
+
+:where(.css-dev-only-do-not-override-p7e5j5).ant-form-item .ant-form-item-label>label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+  display: inline-block;
+  margin-inline-end: 4px;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: "*";
+}
 .MuiFormControl-root.MuiTextField-root.css-1u3bzj6-MuiFormControl-root-MuiTextField-root {
   float: right;
 }
