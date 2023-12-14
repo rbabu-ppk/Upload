@@ -52,7 +52,6 @@ const Job: React.FC = () => {
 
   return (
     <Row justify="center">
-      {/* <Col xs={24} sm={20} md={16} lg={24} xl={24}> */}
       <Col xs={24} sm={24} md={20} lg={20} xl={20}>
         <div
           style={{
@@ -72,7 +71,17 @@ const Job: React.FC = () => {
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
           >
-            <Form.Item label="Email" name="email" rules={[{ required: true }]}>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true },
+                {
+                  type: "email",
+                  message: "Please enter a valid email address.",
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
             <Form.Item

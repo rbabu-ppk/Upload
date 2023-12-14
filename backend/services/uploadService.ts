@@ -9,7 +9,7 @@ export const uploadFileService = async (
   selectedOption: String,
   file: any
 ) => {
-  const status = "In Progress";
+  const status = "Completed";
   await jobModel.create({ email, status });
 
   if (selectedOption === "Site") {
